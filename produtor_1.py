@@ -2,10 +2,18 @@ import os
 import pika
 from pika.exchange_type import ExchangeType
 
+#direct = {
+#    'info'      :   'Log info...    ',
+#    'warning'   :   'Log warning... ',
+#    'erro'      :   'Log erro...    '
+#}
+
 direct = {
-    'info'      :   'Log info...    ',
-    'warning'   :   'Log warning... ',
-    'erro'      :   'Log erro...    '
+    'categoria_1'      :   ['Produtos categoria 1...'],
+    'categoria_2'      :   ['Produtos categoria 2...'],
+    'categoria_3'      :   ['Produtos categoria 3...'],
+    'categoria_4'      :   ['Produtos categoria 4...']
+    'categoria_5'      :   ['Produtos categoria 5...']
 }
 
 params = pika.ConnectionParameters('localhost')

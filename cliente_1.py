@@ -13,7 +13,7 @@ id = ''
 
 # Direct
 channel.exchange_declare(exchange='ads', exchange_type=ExchangeType.direct)
-queue_logs = channel.queue_declare(queue=f'ads_{id}', exclusive=True)
+queue_logs = channel.queue_declare(queue=f'ads_{cpf}', exclusive=True)
 
 channel.queue_bind(exchange='ads', queue=queue_logs.method.queue, routing_key='categoria_1')
 channel.queue_bind(exchange='ads', queue=queue_logs.method.queue, routing_key='categoria_3')
