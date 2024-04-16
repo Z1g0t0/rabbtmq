@@ -3,7 +3,7 @@ import time
 import pika
 from pika.exchange_type import ExchangeType
 
-cpf = '123456789-10'
+cpf = '109876543-21'
 pedido_c = 0
 
 def process_msg(ch, method, properties, body):
@@ -12,15 +12,15 @@ def process_msg(ch, method, properties, body):
 
     body = body.decode("utf-8")
 
-    print(f"\nCliente 1 - Notificacao AD: {body}")
+    print(f"\nCliente 2 - Notificacao AD: {body}")
 
     r = random.randint(0, 12)
 
-    if r >= 3:
+    if r % 2 == 0:
 
         pedido_c += 1
 
-        print(f"Cliente 1 [{cpf}] - Requisitando pedido {pedido_c}")
+        print(f"Cliente 2 [{cpf}] - Requisitando pedido {pedido_c}")
 
         r_key = f"Pedido.{pedido_c}.CPF.{cpf}.Requerido"
         body = f"Pedido_numero: {pedido_c}, \n\tComprador_CPF: {cpf} "
@@ -44,9 +44,9 @@ if __name__ == "__main__":
     ads_q = channel.queue_declare(queue=f'ads_{cpf}', exclusive=True)
 
     channel.queue_bind( exchange='ads', queue=ads_q.method.queue, 
-                        routing_key='categoria_1' )
+                        routing_key='categoria_2' )
     channel.queue_bind( exchange='ads', queue=ads_q.method.queue, 
-                        routing_key='categoria_3' )
+                        routing_key='categoria_4' )
     channel.queue_bind( exchange='ads', queue=ads_q.method.queue, 
                         routing_key='categoria_5' )
 
@@ -54,6 +54,6 @@ if __name__ == "__main__":
                            on_message_callback=process_msg )
 
 
-    print("\nInicio Cliente 1 - Categorias 1, 3, 5")
+    print("\nInicio Cliente 2 - Categorias 2, 4, 5")
 
     channel.start_consuming()

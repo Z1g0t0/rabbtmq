@@ -1,22 +1,39 @@
-import os
 import pika
 from pika.exchange_type import ExchangeType
 
-params = pika.ConnectionParameters('localhost')
-connection = pika.BlockingConnection(params)
-channel = connection.channel()
+def process_pgt(ch, method, properties, body):
 
-channel.exchange_declare(exchange='pagamentos', exchange_type=ExchangeType.topic)
+    body = body.decode("utf-8")
 
-while True:
+    print(f'Agencia - Pagamento Recebido\n\t{body}\n')
+    channel.basic_publish( exchange='pagamento',
+                           routing_key=f"Pagamento.{body}.Aprovado", 
+                           body=f"{body}" )
 
-    #os.system('cls')
-    #os.system('clear')
+    print(f'Agencia - Pagamento APROVADO\n\t{body}\n')
 
-    bind = input("\nDigite uma sequencia ou -1 para sair: \n\n")
 
-    if bind == '-1': break
-    else:
-        channel.basic_publish(exchange='topics', routing_key=bind, body=bind)
+if __name__ == "__main__":
 
-connection.close()
+    params = pika.ConnectionParameters('localhost')
+    connection = pika.BlockingConnection(params)
+    channel = connection.channel()
+
+    channel.exchange_declare( exchange='pagamento', 
+                              exchange_type=ExchangeType.topic )
+
+    pagamento_env_q = channel.queue_declare( queue='pagamentos_env', 
+                                             exclusive=True )
+    channel.queue_bind( exchange='pagamento', 
+                        queue=pagamento_env_q.method.queue, 
+                        routing_key=f'Pagamento.#.Enviado' )
+
+    pagamento_rec_q = channel.queue_declare(queue='pagamentos_rec', exclusive=True)
+
+    channel.basic_consume( queue=pagamento_env_q.method.queue, auto_ack=True, 
+                           on_message_callback=process_pgt)
+
+
+    print('\nInicio Agencia de Credito\n')
+
+    channel.start_consuming()
